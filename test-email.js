@@ -69,7 +69,7 @@ async function testEmail() {
         console.log('📬 Message ID:', info.messageId);
         console.log('');
         console.log('🎉 ¡Tu configuración está perfecta!');
-        console.log('📧 Revisa tu email en: sistemas16ch@gmail.com');
+        console.log('📧 Revisa tu email en: cleancielito@cielitohome.com');
         console.log('');
         console.log('🚀 Ahora ejecuta: npm start');
         console.log('🌐 Luego ve a: http://localhost:3000/contacto.html');
@@ -109,8 +109,8 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.error('❌ Error: Archivo .env no configurado correctamente');
     console.error('');
     console.error('Asegúrate de que tu archivo .env contenga:');
-    console.error('EMAIL_USER=sistemas16ch@gmail.com');
-    console.error('EMAIL_PASS=fatrwbrdnqzyvbnt');
+    console.error('EMAIL_USER=cleancielito@cielitohome.com');
+    console.error('EMAIL_PASS=ylfotrlvjhsgzyym');
     console.error('COMPANY_EMAIL=cielitoclean@cielitohome.com');
     console.error('COMPANY_NAME=Cielito Home Clean');
     process.exit(1);
