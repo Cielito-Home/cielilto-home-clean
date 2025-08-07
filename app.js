@@ -23,14 +23,15 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
-            scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://www.gstatic.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "https://firebase.googleapis.com", "https://firestore.googleapis.com"],
             frameSrc: ["'self'", "https://www.google.com"],
         },
     },
 }));
+
 
 // CORS configuration
 app.use(cors({

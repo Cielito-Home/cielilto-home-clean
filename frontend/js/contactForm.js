@@ -1,8 +1,6 @@
-import { addDoc, db, collection, serverTimestamp } from "firebase/firestore";
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Inicializando contactForm.js...');
-    
+
     // Manejar formulario de contacto
     const contactForm = document.getElementById('contactForm');
     console.log('📋 Formulario encontrado:', !!contactForm);
@@ -60,23 +58,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('✅ Éxito!');
                     // Mostrar mensaje de éxito
                     showMessage('success', '¡Mensaje enviado exitosamente! Te contactaremos pronto.');
-                    
-                    // Reset form
-                    contactForm.reset();
                     try {
-                      await addDoc(collection(db, 'mensajesContacto'), {
-                        name: data.name,
-                        email: data.email,
-                        phone: data.phone,
-                        service: data.service,
-                        message: data.message,
-                        privacyAccepted: data.privacy === 'on' || data.privacy === true,
-                        timestamp: serverTimestamp()
-                      });
+                        await db.collection('mensajesContacto').add({
+                          name: data.name,
+                          email: data.email,
+                          phone: data.phone,
+                          service: data.service,
+                          message: data.message,
+                          privacyAccepted: data.privacy === 'on' || data.privacy === true,
+                          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
                       console.log('📁 Registro guardado en Firebase');
                     } catch (firebaseError) {
                       console.error('⚠️ Error al guardar en Firebase:', firebaseError);
                     }
+                    // Reset form
+                    contactForm.reset();
                     
                     // Opcional: redirigir a WhatsApp después de 3 segundos
                     setTimeout(() => {
@@ -168,9 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 if (result.success) {
-                    await addDoc(collection(db, 'suscripcionesNewsletter'), {
+                    await db.collection('suscripcionesNewsletter').add({
                       email: email,
-                      timestamp: serverTimestamp()
+                      timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     showMessage('success', '¡Suscripción exitosa! Revisa tu email para tu descuento de bienvenida.');
                     emailInput.value = '';
