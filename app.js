@@ -17,6 +17,8 @@ if (isDevelopment) {
     console.log('🔒 MODO PRODUCCIÓN - Rate limiting estricto');
 }
 
+app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
+
 // Middlewares de seguridad
 app.use(helmet({
     contentSecurityPolicy: {

@@ -1,3 +1,6 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
 const firebaseConfig = {
   apiKey: "AIzaSyBQxxfctZoCFH4JwEybLU8fxIbhi11_uTs",
   authDomain: "clean-ceebe.firebaseapp.com",
@@ -8,11 +11,8 @@ const firebaseConfig = {
   measurementId: "G-4NEW8NX8Q8"
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-// Inicializa Firestore
-const db = firebase.firestore();
-
-// Exportar para uso global
-window.db = db;
-window.firebase = firebase;
+export { db, collection, addDoc, serverTimestamp };
+export {app};

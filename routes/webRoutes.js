@@ -76,6 +76,11 @@ router.get('/home', (req, res) => {
     res.redirect(301, '/');
 });
 
+router.get('/panel-newsletter.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/panel-newsletter.html'));
+});
+
+
 // ⚠️ REMOVER ESTE MIDDLEWARE 404 - Se maneja en app.js
 // NO agregar middleware 404 aquí
 
