@@ -118,7 +118,7 @@ app.use(generalLimiter);
 
 // Configuración básica - RUTAS CORREGIDAS
 app.use(express.static(path.join(__dirname, 'frontend')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/admin', express.static(path.join(__dirname, 'frontend','admin')));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
