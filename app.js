@@ -17,21 +17,56 @@ if (isDevelopment) {
     console.log('🔒 MODO PRODUCCIÓN - Rate limiting estricto');
 }
 
-// Middlewares de seguridad
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
-            scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://www.gstatic.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-            imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "https://firebase.googleapis.com", "https://firestore.googleapis.com"],
-            frameSrc: ["'self'", "https://www.google.com"],
-        },
-    },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: [
+        "'self'","'unsafe-inline'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://fonts.googleapis.com"
+      ],
+      scriptSrc: [
+        "'self'","'unsafe-inline'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://www.gstatic.com",
+        "https://apis.google.com",
+        "https://www.google.com"
+      ],
+      imgSrc: [
+        "'self'","data:","https:","blob:",
+        "https://lh3.googleusercontent.com"
+      ],
+      fontSrc: [
+        "'self'","https://fonts.gstatic.com","https://cdnjs.cloudflare.com"
+      ],
+      connectSrc: [
+        "'self'",
+        "https://firebase.googleapis.com",
+        "https://firestore.googleapis.com",
+        "https://identitytoolkit.googleapis.com",
+        "https://securetoken.googleapis.com",
+        "https://www.googleapis.com",
+        "https://oauth2.googleapis.com",
+        "https://apis.google.com"
+      ],
+      frameSrc: [
+        "'self'",
+        "https://accounts.google.com",
+        "https://*.google.com",
+        "https://*.gstatic.com",
+        "https://*.firebaseapp.com",
+        "https://*.firebaseio.com"
+      ],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
 }));
-
 
 // CORS configuration
 app.use(cors({
@@ -79,8 +114,9 @@ const newsletterLimiter = rateLimit({
 // Aplicar rate limiting general
 app.use(generalLimiter);
 
-// Configuración básica
+// Configuración básica - RUTAS CORREGIDAS
 app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
@@ -97,6 +133,8 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+
 
 // Middleware de debug para formularios
 app.use('/contact', (req, res, next) => {
@@ -146,8 +184,8 @@ app.use('*', (req, res) => {
         });
     }
     
-    // Para peticiones normales, servir la página 404.html
-    res.status(404).sendFile(path.join(__dirname, '../frontend/404.html'));
+    // Para peticiones normales, servir la página 404.html - RUTA CORREGIDA
+    res.status(404).sendFile(path.join(__dirname, 'frontend/404.html'));
 });
 
 // Middleware para manejo de errores
@@ -172,8 +210,8 @@ app.use((error, req, res, next) => {
         });
     }
     
-    // Para peticiones normales, servir la página 404.html como fallback
-    res.status(500).sendFile(path.join(__dirname, '../frontend/404.html'));
+    // Para peticiones normales, servir la página 404.html como fallback - RUTA CORREGIDA
+    res.status(500).sendFile(path.join(__dirname, 'frontend/404.html'));
 });
 
 // Mostrar límites actuales al iniciar

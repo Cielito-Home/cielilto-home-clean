@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Inicializando contactForm.js...');
 
+    // Verificar Firebase
+    if (!window.db) {
+        console.error('❌ Firebase no está disponible');
+        return;
+    }
+
     // Manejar formulario de contacto
     const contactForm = document.getElementById('contactForm');
     console.log('📋 Formulario encontrado:', !!contactForm);
@@ -58,6 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('✅ Éxito!');
                     // Mostrar mensaje de éxito
                     showMessage('success', '¡Mensaje enviado exitosamente! Te contactaremos pronto.');
+                    
+                    // Guardar en Firebase
                     try {
                         await db.collection('mensajesContacto').add({
                           name: data.name,
@@ -68,10 +76,11 @@ document.addEventListener('DOMContentLoaded', function() {
                           privacyAccepted: data.privacy === 'on' || data.privacy === true,
                           timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                      console.log('📁 Registro guardado en Firebase');
+                        console.log('📁 Registro guardado en Firebase');
                     } catch (firebaseError) {
-                      console.error('⚠️ Error al guardar en Firebase:', firebaseError);
+                        console.error('⚠️ Error al guardar en Firebase:', firebaseError);
                     }
+                    
                     // Reset form
                     contactForm.reset();
                     
@@ -100,7 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('❌ No se encontró el formulario de contacto');
     }
     
-    // Manejar formulario de newsletter
+    // Manejar formularios de newsletter
+    console.log('📧 Buscando formularios de newsletter...');
+    
+    // Buscar todos los formularios de newsletter
     const newsletterForms = document.querySelectorAll('form:has(input[type="email"][placeholder*="correo"])');
     console.log('📧 Formularios de newsletter encontrados:', newsletterForms.length);
     
@@ -146,6 +158,25 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = true;
             
             try {
+                // 1. Verificar si ya existe en Firebase
+                const existingQuery = await db.collection('newsletter_users')
+                    .where('correo', '==', email)
+                    .get();
+                
+                if (!existingQuery.empty) {
+                    showMessage('error', 'Este email ya está suscrito');
+                    return;
+                }
+                
+                // 2. Guardar en Firebase
+                await db.collection('newsletter_users').add({
+                    correo: email,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                console.log('✅ Email guardado en Firebase');
+                
+                // 3. Enviar email de bienvenida
                 const response = await fetch('/newsletter', {
                     method: 'POST',
                     headers: {
@@ -165,14 +196,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 if (result.success) {
-                    await db.collection('suscripcionesNewsletter').add({
-                      email: email,
-                      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
                     showMessage('success', '¡Suscripción exitosa! Revisa tu email para tu descuento de bienvenida.');
                     emailInput.value = '';
                 } else {
-                    showMessage('error', result.message || 'Error al suscribirse');
+                    showMessage('error', result.message || 'Error al enviar email de bienvenida');
                 }
                 
             } catch (error) {

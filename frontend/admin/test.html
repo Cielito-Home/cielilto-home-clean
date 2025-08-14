@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: #f0f0f0; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            max-width: 500px; 
+            margin: 0 auto; 
+        }
+        button { 
+            background: #4285f4; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .info { 
+            background: #e8f5e8; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🧪 Test de Login - Cielito Home Clean</h2>
+        
+        <div id="userStatus" class="info">
+            Estado: Verificando...
+        </div>
+        
+        <button onclick="testLogin()">🔐 Test Login Google</button>
+        
+        <button onclick="window.signOut()" style="background: #dc3545; margin-left: 10px;">
+            🚪 Logout
+        </button>
+        
+        <div id="debugInfo" style="background: #f8f9fa; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+            <strong>Debug Info:</strong><br>
+        </div>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module">
+        const userStatus = document.getElementById('userStatus');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        function addDebug(msg) {
+            console.log(msg);
+            debugInfo.innerHTML += new Date().toLocaleTimeString() + ': ' + msg + '<br>';
+            debugInfo.scrollTop = debugInfo.scrollHeight;
+        }
+        
+        // Test function
+        window.testLogin = async function() {
+            addDebug('🚀 Iniciando test de login...');
+            
+            try {
+                const result = await window.signInWithGoogle();
+                addDebug('📋 Resultado: ' + JSON.stringify(result));
+                
+                if (result.success) {
+                    addDebug('✅ Login exitoso!');
+                    updateUserStatus();
+                } else {
+                    addDebug('❌ Login falló: ' + result.error);
+                }
+            } catch (error) {
+                addDebug('💥 Error: ' + error.message);
+            }
+        }
+        
+        function updateUserStatus() {
+            setTimeout(() => {
+                if (window.auth && window.auth.currentUser) {
+                    const user = window.auth.currentUser;
+                    userStatus.innerHTML = `
+                        ✅ <strong>Autenticado:</strong><br>
+                        📧 ${user.email}<br>
+                        👤 ${user.displayName || 'Sin nombre'}<br>
+                        🆔 ${user.uid}
+                    `;
+                    addDebug('✅ Usuario cargado: ' + user.email);
+                } else {
+                    userStatus.innerHTML = '❌ <strong>No autenticado</strong>';
+                    addDebug('❌ No hay usuario');
+                }
+            }, 1000);
+        }
+        
+        // Check initial status
+        setTimeout(() => {
+            addDebug('🔍 Verificando estado inicial...');
+            addDebug('📍 URL: ' + window.location.href);
+            addDebug('🔧 Firebase Auth disponible: ' + !!window.auth);
+            addDebug('🔧 signInWithGoogle disponible: ' + !!window.signInWithGoogle);
+            
+            updateUserStatus();
+        }, 2000);
+        
+        // Auth state observer
+        setTimeout(() => {
+            if (window.auth) {
+                window.auth.onAuthStateChanged((user) => {
+                    addDebug('👤 Auth state changed: ' + (user ? user.email : 'null'));
+                    updateUserStatus();
+                });
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

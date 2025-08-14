@@ -1,10 +1,9 @@
 const path = require('path');
 const nodemailer = require('nodemailer');
 
-// Configuración del transportador de email
 const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail', // Puedes cambiar por otro servicio
+    return nodemailer.createTransport({  // ⚠️ DEBE SER createTransport
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER || 'tu-email@gmail.com',
             pass: process.env.EMAIL_PASS || 'tu-app-password'
@@ -371,5 +370,72 @@ exports.handleNewsletter = async (req, res) => {
         } else {
             res.redirect('/?newsletter=error');
         }
+    }
+};
+
+// Agregar al final del archivo contactController.js si no existe:
+
+exports.handleAdminNewsletter = async (req, res) => {
+    try {
+        const { subject, content, subscribers } = req.body;
+        
+        if (!subject || !content || !subscribers || !Array.isArray(subscribers)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Datos incompletos'
+            });
+        }
+
+        if (subscribers.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No hay suscriptores'
+            });
+        }
+
+        const transporter = createTransporter();
+        let sentCount = 0;
+        let errors = [];
+
+        console.log(`📧 Enviando newsletter a ${subscribers.length} suscriptores...`);
+
+        // Enviar a cada suscriptor
+        for (const email of subscribers) {
+            try {
+                await transporter.sendMail({
+                    from: `"Cielito Home Clean" <${process.env.EMAIL_USER}>`,
+                    to: email,
+                    subject: subject,
+                    html: content
+                });
+                
+                sentCount++;
+                console.log(`✅ Enviado a: ${email}`);
+                
+                // Pausa para no saturar el servidor
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+            } catch (error) {
+                console.error(`❌ Error enviando a ${email}:`, error.message);
+                errors.push(email);
+            }
+        }
+
+        console.log(`🎉 Newsletter enviado a ${sentCount}/${subscribers.length} suscriptores`);
+
+        res.json({
+            success: true,
+            message: 'Newsletter enviado exitosamente',
+            sentCount: sentCount,
+            totalSubscribers: subscribers.length,
+            errors: errors.length
+        });
+
+    } catch (error) {
+        console.error('❌ Error enviando newsletter:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor: ' + error.message
+        });
     }
 };

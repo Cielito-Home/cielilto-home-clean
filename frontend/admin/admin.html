@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin Newsletter - Cielito Home Clean</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1>
+                        <i class="fas fa-leaf"></i>Panel Admin Newsletter
+                    </h1>
+                    <p>Gestiona suscriptores y envía newsletters profesionales</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button id="refreshBtn" class="btn">
+                        <i class="fas fa-sync-alt"></i>Actualizar
+                    </button>
+                    <button id="exportBtn" class="btn">
+                        <i class="fas fa-download"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="container my-5">
+        <!-- Navigation Tabs -->
+        <div class="admin-nav-tabs mb-4">
+            <ul class="nav nav-pills nav-justified" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">
+                        <i class="fas fa-chart-bar me-2"></i>Dashboard
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="newsletter-tab" data-bs-toggle="tab" data-bs-target="#newsletter" type="button" role="tab">
+                        <i class="fas fa-envelope me-2"></i>Newsletter
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                        <i class="fas fa-history me-2"></i>Historial
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="adminTabsContent">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                <!-- Stats -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h5>Total Suscriptores</h5>
+                            <div class="stat-number" id="totalSubscribers">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h5>Hoy</h5>
+                            <div class="stat-number" id="todaySubscribers">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h5>Esta Semana</h5>
+                            <div class="stat-number" id="weekSubscribers">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Subscribers List -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <!-- Subscribers List -->
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <i class="fas fa-users"></i>
+                                <h5>Lista de Suscriptores</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="subscribersContainer">
+                                    <div class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                        <p class="mt-3 text-muted">Cargando suscriptores...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Recent Activity -->
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <i class="fas fa-clock"></i>
+                                <h6>Actividad Reciente</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentActivity">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                        <p class="mt-3 text-muted">Cargando actividad...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Tab -->
+            <div class="tab-pane fade" id="newsletter" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <i class="fas fa-envelope"></i>
+                                <h5>Crear Newsletter</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Plantillas predeterminadas -->
+                                <div class="template-selector mb-4">
+                                    <h6 class="mb-3">📋 Plantillas Rápidas</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="template-card" data-template="ofertas">
+                                                <div class="template-preview">
+                                                    <i class="fas fa-percent"></i>
+                                                </div>
+                                                <h6>Ofertas Especiales</h6>
+                                                <small>Click para usar</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="template-card" data-template="tips">
+                                                <div class="template-preview">
+                                                    <i class="fas fa-lightbulb"></i>
+                                                </div>
+                                                <h6>Tips de Limpieza</h6>
+                                                <small>Click para usar</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="template-card" data-template="noticias">
+                                                <div class="template-preview">
+                                                    <i class="fas fa-newspaper"></i>
+                                                </div>
+                                                <h6>Noticias</h6>
+                                                <small>Click para usar</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearFormBtn">
+                                    <i class="fas fa-eraser me-1"></i>Limpiar Todo
+                                </button>
+                                </div>
+
+                                <!-- Formulario del newsletter -->
+                                <form id="newsletterForm" class="newsletter-form">
+                                    <!-- Asunto -->
+                                    <div class="mb-4">
+                                        <label for="subject" class="form-label">
+                                            <i class="fas fa-tag"></i>Asunto del Email
+                                        </label>
+                                        <input type="text" class="form-control" id="subject" name="subject" 
+                                               placeholder="Ej: Ofertas especiales de enero 2024" required>
+                                    </div>
+
+                                    <!-- Editor Visual -->
+                                    <div class="mb-4">
+                                        <label class="form-label">
+                                            <i class="fas fa-edit"></i>Contenido del Newsletter
+                                        </label>
+                                        
+                                        <!-- Toolbar -->
+                                        <div class="editor-toolbar">
+                                            <div class="toolbar-group">
+                                                <button type="button" class="toolbar-btn" data-action="bold">
+                                                    <i class="fas fa-bold"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="italic">
+                                                    <i class="fas fa-italic"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="underline">
+                                                    <i class="fas fa-underline"></i>
+                                                </button>
+                                            </div>
+                                            <div class="toolbar-group">
+                                                <button type="button" class="toolbar-btn" data-action="h2">
+                                                    H2
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="h3">
+                                                    H3
+                                                </button>
+                                            </div>
+                                            <div class="toolbar-group">
+                                                <button type="button" class="toolbar-btn" data-action="ul">
+                                                    <i class="fas fa-list-ul"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="link">
+                                                    <i class="fas fa-link"></i>
+                                                </button>
+                                                <button type="button" class="toolbar-btn" data-action="color">
+                                                    <i class="fas fa-palette"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Editor -->
+                                        <div class="visual-editor" id="visualEditor" contenteditable="true">
+                                            <p>Escribe aquí tu mensaje o usa una plantilla...</p>
+                                        </div>
+
+                                        <!-- Componentes rápidos -->
+                                        <div class="quick-components mt-3">
+                                            <h6 class="mb-2">🧩 Componentes Rápidos</h6>
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-component="oferta">
+                                                    <i class="fas fa-percent me-1"></i>Caja de Oferta
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-component="tip">
+                                                    <i class="fas fa-lightbulb me-1"></i>Tip de Limpieza
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-component="boton">
+                                                    <i class="fas fa-hand-pointer me-1"></i>Botón de WhatsApp
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-component="saludo">
+                                                    <i class="fas fa-smile me-1"></i>Saludo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campo oculto para HTML -->
+                                    <textarea id="content" name="content" style="display: none;"></textarea>
+
+                                    <!-- Confirmación -->
+                                    <div class="mb-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="confirmSend" required>
+                                            <label class="form-check-label" for="confirmSend">
+                                                <strong>✅ Confirmo que quiero enviar este newsletter a todos los suscriptores</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botón -->
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-paper-plane me-2"></i>Enviar Newsletter
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <i class="fas fa-eye"></i>
+                                <h6>Vista Previa</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="previewContainer" class="preview-container">
+                                    <p class="text-muted text-center">
+                                        <i class="fas fa-eye-slash mb-2 d-block"></i>
+                                        La vista previa aparecerá aquí mientras escribes
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ayuda -->
+                        <div class="admin-card mt-3">
+                            <div class="card-header">
+                                <i class="fas fa-question-circle"></i>
+                                <h6>Ayuda Rápida</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="help-item mb-3">
+                                    <strong>🖊 Escribir:</strong>
+                                    <p class="mb-0">Escribe en el editor como en Word</p>
+                                </div>
+                                <div class="help-item mb-3">
+                                    <strong>📋 Plantillas:</strong>
+                                    <p class="mb-0">Usa las plantillas rápidas para empezar</p>
+                                </div>
+                                <div class="help-item mb-3">
+                                    <strong>🎨 Formato:</strong>
+                                    <p class="mb-0">Selecciona texto y usa los botones</p>
+                                </div>
+                                <div class="help-item">
+                                    <strong>🧩 Componentes:</strong>
+                                    <p class="mb-0">Agrega elementos especiales con un click</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-pane fade" id="history" role="tabpanel">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i>
+                        <h5>Historial de Newsletters</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="historyContainer">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="mt-3 text-muted">Cargando historial...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">
+                        <i class="fas fa-paper-plane me-2"></i>Confirmar Envío de Newsletter
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>¡Atención!</strong> Estás a punto de enviar el newsletter a <span id="subscriberCount">0</span> suscriptores.
+                        </div>
+                    </div>
+                    <p>Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmSendBtn">
+                        <i class="fas fa-paper-plane me-2"></i>Enviar Newsletter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
