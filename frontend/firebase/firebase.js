@@ -251,3 +251,33 @@ export {
   // Auth base
   GoogleAuthProvider
 };
+
+// Asegura que exista el namespace
+window.firebase = window.firebase || {};
+window.firebase.firestore = {
+  // Firestore v10 funciones que usas en admin.js
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  where,
+  limit
+};
+
+// Exponer instancias para admin.js
+window.app  = app;
+window.db   = db;
+window.auth = auth;
+
+// Puentes a tus helpers (admin.js llama “checkUserAuthorization” y “signOut”)
+window.checkUserAuthorization = async (email) => {
+  // normaliza por si acaso
+  return (await checkPanelAccess(email.toLowerCase())).allowed === true;
+};
+window.signOut = logOut;

@@ -38,7 +38,8 @@ app.use(helmet({
       ],
       imgSrc: [
         "'self'","data:","https:","blob:",
-        "https://lh3.googleusercontent.com"
+        "https://lh3.googleusercontent.com",
+        "https://firebasestorage.googleapis.com"
       ],
       fontSrc: [
         "'self'","https://fonts.gstatic.com","https://cdnjs.cloudflare.com"
@@ -47,6 +48,8 @@ app.use(helmet({
         "'self'",
         "https://firebase.googleapis.com",
         "https://firestore.googleapis.com",
+        "https://firebasestorage.googleapis.com",
+        "https://*.cloudfunctions.net",
         "https://identitytoolkit.googleapis.com",
         "https://securetoken.googleapis.com",
         "https://www.googleapis.com",
@@ -60,14 +63,16 @@ app.use(helmet({
         "https://*.google.com",
         "https://*.gstatic.com",
         "https://*.firebaseapp.com",
-        "https://*.firebaseio.com"
+        "https://*.firebaseio.com",
+        "https://*.googleusercontent.com"
       ],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"]
     }
   },
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }));
 
 // CORS configuration
@@ -113,14 +118,14 @@ const newsletterLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-// Aplicar rate limiting general
-app.use(generalLimiter);
-
 // Configuración básica - RUTAS CORREGIDAS
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/admin', express.static(path.join(__dirname, 'frontend','admin')));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
+
+// Aplicar rate limiting general
+app.use(generalLimiter);
 
 // Middleware para logging
 app.use((req, res, next) => {
