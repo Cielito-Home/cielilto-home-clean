@@ -122,9 +122,6 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
-// Usar rutas
-app.use('/', webRoutes);
-
 // Middleware para logging
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -171,7 +168,8 @@ const webRoutes = require('./routes/webRoutes');
 app.use('/contact', contactLimiter);
 app.use('/newsletter', newsletterLimiter);
 
-
+// Usar rutas
+app.use('/', webRoutes);
 
 // ⚠️ MIDDLEWARE 404 - DEBE IR AL FINAL DE TODAS LAS RUTAS
 app.use('*', (req, res) => {
