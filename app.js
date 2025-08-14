@@ -33,7 +33,8 @@ app.use(helmet({
         "https://cdnjs.cloudflare.com",
         "https://www.gstatic.com",
         "https://apis.google.com",
-        "https://www.google.com"
+        "https://www.google.com",
+        "https://www.googleapis.com"  
       ],
       imgSrc: [
         "'self'","data:","https:","blob:",
@@ -50,7 +51,8 @@ app.use(helmet({
         "https://securetoken.googleapis.com",
         "https://www.googleapis.com",
         "https://oauth2.googleapis.com",
-        "https://apis.google.com"
+        "https://apis.google.com",
+        "https://accounts.google.com" 
       ],
       frameSrc: [
         "'self'",
@@ -120,6 +122,9 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
+// Usar rutas
+app.use('/', webRoutes);
+
 // Middleware para logging
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -166,8 +171,7 @@ const webRoutes = require('./routes/webRoutes');
 app.use('/contact', contactLimiter);
 app.use('/newsletter', newsletterLimiter);
 
-// Usar rutas
-app.use('/', webRoutes);
+
 
 // ⚠️ MIDDLEWARE 404 - DEBE IR AL FINAL DE TODAS LAS RUTAS
 app.use('*', (req, res) => {
