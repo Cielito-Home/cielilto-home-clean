@@ -90,15 +90,49 @@ function clearNewsletterForm() {
                 </p>
             </div>
             <div class="color-picker-actions">
-                <button class="color-picker-btn secondary" onclick="closeClearConfirm()">
+                <button class="color-picker-btn secondary" id="clearConfirmCancelBtn">
                     <i class="fas fa-times me-2"></i>Cancelar
                 </button>
-                <button class="color-picker-btn primary" onclick="confirmClear()" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <button class="color-picker-btn primary" id="clearConfirmBtn" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
                     <i class="fas fa-trash me-2"></i>Limpiar Todo
                 </button>
             </div>
         </div>
     `;
+    // Listeners externos para los botones del modal
+    confirmDiv.querySelector('#clearConfirmCancelBtn').addEventListener('click', function() {
+        confirmDiv.remove();
+    });
+    confirmDiv.querySelector('#clearConfirmBtn').addEventListener('click', function() {
+        // Limpiar campos con animación
+        const subjectField = document.getElementById('subject');
+        const editor = document.getElementById('visualEditor');
+        const contentField = document.getElementById('content');
+        const confirmCheckbox = document.getElementById('confirmSend');
+        [subjectField, editor].forEach(field => {
+            if (field) {
+                field.style.transition = 'all 0.3s ease';
+                field.style.transform = 'scale(0.95)';
+                field.style.opacity = '0.5';
+            }
+        });
+        setTimeout(() => {
+            if (subjectField) subjectField.value = '';
+            if (editor) editor.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">Escribe aquí tu mensaje o usa una plantilla...</p>';
+            if (contentField) contentField.value = '';
+            if (confirmCheckbox) confirmCheckbox.checked = false;
+            document.querySelectorAll('.template-card.selected').forEach(card => card.classList.remove('selected'));
+            [subjectField, editor].forEach(field => {
+                if (field) {
+                    field.style.transform = 'scale(1)';
+                    field.style.opacity = '1';
+                }
+            });
+            updatePreview();
+            showSuccess('🧹 Formulario limpiado completamente');
+        }, 300);
+        confirmDiv.remove();
+    });
     
     document.body.appendChild(confirmDiv);
     
@@ -233,57 +267,63 @@ function insertColorPicker() {
     modal.innerHTML = `
         <div class="color-picker-content">
             <h3 class="color-picker-title">🎨 Selecciona un Color</h3>
-            
             <div class="color-options">
                 <div class="color-option" data-color="#2d5a3d" data-name="Verde Cielito">
                     <div class="color-preview" style="background-color: #2d5a3d;"></div>
                     <div class="color-name">Verde Cielito</div>
                     <div class="color-code">#2d5a3d</div>
                 </div>
-                
                 <div class="color-option" data-color="#c9a876" data-name="Dorado">
                     <div class="color-preview" style="background-color: #c9a876;"></div>
                     <div class="color-name">Dorado</div>
                     <div class="color-code">#c9a876</div>
                 </div>
-                
                 <div class="color-option" data-color="#1e293b" data-name="Gris Oscuro">
                     <div class="color-preview" style="background-color: #1e293b;"></div>
                     <div class="color-name">Gris Oscuro</div>
                     <div class="color-code">#1e293b</div>
                 </div>
-                
                 <div class="color-option" data-color="#64748b" data-name="Gris Medio">
                     <div class="color-preview" style="background-color: #64748b;"></div>
                     <div class="color-name">Gris Medio</div>
                     <div class="color-code">#64748b</div>
                 </div>
-                
                 <div class="color-option" data-color="#ef4444" data-name="Rojo">
                     <div class="color-preview" style="background-color: #ef4444;"></div>
                     <div class="color-name">Rojo</div>
                     <div class="color-code">#ef4444</div>
                 </div>
-                
                 <div class="color-option" data-color="#3b82f6" data-name="Azul">
                     <div class="color-preview" style="background-color: #3b82f6;"></div>
                     <div class="color-name">Azul</div>
                     <div class="color-code">#3b82f6</div>
                 </div>
             </div>
-            
             <input type="text" class="custom-color-input" placeholder="O ingresa un código hex (ej: #2d5a3d)" maxlength="7">
-            
             <div class="color-picker-actions">
-                <button class="color-picker-btn secondary" onclick="closeColorPicker()">
+                <button class="color-picker-btn secondary" id="colorPickerCancelBtn">
                     <i class="fas fa-times me-2"></i>Cancelar
                 </button>
-                <button class="color-picker-btn primary" onclick="applySelectedColor()">
+                <button class="color-picker-btn primary" id="colorPickerApplyBtn">
                     <i class="fas fa-check me-2"></i>Aplicar
                 </button>
             </div>
         </div>
     `;
+    // Listeners externos para los botones del modal
+    modal.querySelector('#colorPickerCancelBtn').addEventListener('click', function() {
+        modal.remove();
+    });
+    modal.querySelector('#colorPickerApplyBtn').addEventListener('click', function() {
+        const selected = modal.querySelector('.color-option.selected');
+        let color = selected ? selected.getAttribute('data-color') : customInput.value;
+        if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
+            showError('Por favor ingresa un color hexadecimal válido.');
+            return;
+        }
+        document.execCommand('foreColor', false, color);
+        modal.remove();
+    });
     
     document.body.appendChild(modal);
     
@@ -736,7 +776,6 @@ function displaySubscribers(subscribers) {
         const dateStr = subscriber.timestamp 
             ? (subscriber.timestamp.toDate ? subscriber.timestamp.toDate() : new Date(subscriber.timestamp)).toLocaleDateString('es-MX')
             : 'Fecha no disponible';
-            
         html += `
             <div class="subscriber-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
@@ -753,15 +792,20 @@ function displaySubscribers(subscribers) {
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="removeSubscriber('${subscriber.id}', '${subscriber.correo}')">
+                    <button class="btn btn-sm btn-outline-danger remove-subscriber-btn" data-id="${subscriber.id}" data-email="${subscriber.correo}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </div>
         `;
     });
-    
     container.innerHTML = html;
+    // Agregar listeners externos a los botones de eliminar
+    container.querySelectorAll('.remove-subscriber-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            removeSubscriber(this.getAttribute('data-id'), this.getAttribute('data-email'));
+        });
+    });
 }
 
 async function removeSubscriber(id, email) {
@@ -1304,12 +1348,14 @@ function showAlert(type, message) {
         <div class="d-flex align-items-center">
             <i class="fas fa-${icon} me-3" style="font-size: 1.25rem;"></i>
             <span style="flex: 1; font-weight: 600;">${message}</span>
-            <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; opacity: 0.7; cursor: pointer;">×</button>
+            <button type="button" class="btn-close ms-2 admin-alert-close" style="background: none; border: none; font-size: 1.5rem; opacity: 0.7; cursor: pointer;">×</button>
         </div>
     `;
-    
     document.body.appendChild(alertDiv);
-    
+    // Listener externo para cerrar la alerta
+    alertDiv.querySelector('.admin-alert-close').addEventListener('click', function() {
+        alertDiv.remove();
+    });
     // Auto-remove after 5 seconds
     setTimeout(() => {
         if (alertDiv && alertDiv.parentNode) {

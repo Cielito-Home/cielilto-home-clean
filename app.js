@@ -36,7 +36,6 @@ app.use(helmet({
         "https://www.google.com",
         "https://www.googleapis.com"  
       ],
-      scriptSrcAttr: ["'unsafe-inline'"],
       imgSrc: [
         "'self'","data:","https:","blob:",
         "https://lh3.googleusercontent.com",
