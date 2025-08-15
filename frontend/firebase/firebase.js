@@ -225,7 +225,7 @@ export async function saveContacto(payload) {
 
 // Newsletter (suscriptores)
 export async function saveNewsletter(payload) {
-  return createDoc("newsletter", payload);
+  return createDoc("newsletter_users", payload);
 }
 
 // Utilidad para listar mensajes de contacto
@@ -235,7 +235,7 @@ export async function listContacto() {
 
 // Utilidad para listar suscriptores
 export async function listNewsletter() {
-  return listDocs("newsletter");
+  return listDocs("newsletter_users");
 }
 
 /* ============================
