@@ -1821,16 +1821,16 @@ function setupFormValidation() {
     
     function checkFormValidity() {
         const validation = validateNewsletterForm();
-        
         if (submitBtn) {
             submitBtn.disabled = !validation.isValid;
-            
             if (validation.isValid) {
                 submitBtn.classList.remove('btn-outline-primary');
                 submitBtn.classList.add('btn-primary');
+                submitBtn.title = '';
             } else {
                 submitBtn.classList.add('btn-outline-primary');
                 submitBtn.classList.remove('btn-primary');
+                submitBtn.title = validation.errors.join('\n');
             }
         }
     }
