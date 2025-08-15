@@ -225,7 +225,7 @@ export async function saveContacto(payload) {
 
 // Newsletter (suscriptores)
 export async function saveNewsletter(payload) {
-  return createDoc("newsletter", payload);
+  return createDoc("newsletter_users", payload);
 }
 
 // Utilidad para listar mensajes de contacto
@@ -235,7 +235,7 @@ export async function listContacto() {
 
 // Utilidad para listar suscriptores
 export async function listNewsletter() {
-  return listDocs("newsletter");
+  return listDocs("newsletter_users");
 }
 
 /* ============================
@@ -274,6 +274,9 @@ window.firebase.firestore = {
 window.app  = app;
 window.db   = db;
 window.auth = auth;
+
+window.saveNewsletter = saveNewsletter;
+window.saveContacto = saveContacto; // <-- AGREGA ESTA LÍNEA
 
 // Puentes a tus helpers (admin.js llama “checkUserAuthorization” y “signOut”)
 window.checkUserAuthorization = async (email) => {
