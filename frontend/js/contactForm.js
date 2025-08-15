@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 console.log('📧 Enviando newsletter...');
                 const emailInput = this.querySelector('input[type="email"]');
-                const email = emailInput.value.trim();
+                const email = emailInput.value.trim().toLowerCase();
                 if (!email) {
                     showMessage('error', 'Por favor ingresa tu email');
                     return;
@@ -162,17 +162,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 submitBtn.disabled = true;
                 try {
-                    // 1. Verificar si ya existe en Firebase (modular)
+                    // 1. Verificar si ya existe en Firebase (modular, email normalizado)
                     const q = window.firebase.firestore.query(
                         window.firebase.firestore.collection(db, 'newsletter_users'),
                         window.firebase.firestore.where('correo', '==', email)
                     );
                     const existingQuery = await window.firebase.firestore.getDocs(q);
+                    // Log para depuración: mostrar los correos encontrados
+                    const foundEmails = [];
+                    existingQuery.forEach(doc => foundEmails.push(doc.data().correo));
+                    console.log('🔎 Correos encontrados en Firebase:', foundEmails);
                     if (!existingQuery.empty) {
                         showMessage('error', 'Este email ya está suscrito');
                         return;
                     }
-                    // 2. Guardar en Firebase
+                    // 2. Guardar en Firebase (email normalizado)
                     await window.firebase.firestore.addDoc(
                         window.firebase.firestore.collection(db, 'newsletter_users'),
                         {
