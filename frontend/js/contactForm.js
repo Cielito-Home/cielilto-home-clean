@@ -67,20 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Guardar en Firebase
                     try {
-                        await db.collection('mensajesContacto').add({
-                          name: data.name,
-                          email: data.email,
-                          phone: data.phone,
-                          service: data.service,
-                          message: data.message,
-                          privacyAccepted: data.privacy === 'on' || data.privacy === true,
-                          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                    const saveResult = await window.saveContacto({
+                        name: data.name,
+                        email: data.email,
+                        phone: data.phone,
+                        service: data.service,
+                        message: data.message,
+                        privacyAccepted: data.privacy === 'on' || data.privacy === true,
+                        timestamp: new Date()
+                    });
+                    if (saveResult && saveResult.success) {
                         console.log('📁 Registro guardado en Firebase');
-                    } catch (firebaseError) {
-                        console.error('⚠️ Error al guardar en Firebase:', firebaseError);
+                    } else {
+                        throw new Error(saveResult && saveResult.error ? saveResult.error : 'No se pudo guardar');
                     }
-                    
+                } catch (firebaseError) {
+                    console.error('⚠️ Error al guardar en Firebase:', firebaseError);
+                }
                     // Reset form
                     contactForm.reset();
                     
@@ -134,83 +137,90 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function setupNewsletterForm(form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('📧 Enviando newsletter...');
-            
-            const emailInput = this.querySelector('input[type="email"]');
-            const email = emailInput.value.trim();
-            
-            if (!email) {
-                showMessage('error', 'Por favor ingresa tu email');
+   // ...existing code...
+function setupNewsletterForm(form) {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('📧 Enviando newsletter...');
+
+        const emailInput = this.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            showMessage('error', 'Por favor ingresa tu email');
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            showMessage('error', 'Por favor ingresa un email válido');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnContent = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        submitBtn.disabled = true;
+
+        try {
+            // 1. Verificar si ya existe en Firebase
+            // Usa la función modular para buscar
+            const { listNewsletter } = window;
+            const result = await listNewsletter();
+            const exists = result.items.some(item => item.correo === email);
+
+            if (exists) {
+                showMessage('error', 'Este email ya está suscrito');
                 return;
             }
-            
-            if (!validateEmail(email)) {
-                showMessage('error', 'Por favor ingresa un email válido');
-                return;
+
+            // 2. Guardar en Firebase usando la función modular
+            const saveResult = await window.saveNewsletter({
+                correo: email,
+                timestamp: new Date()
+            });
+
+            if (!saveResult.success) {
+                throw new Error(saveResult.error || 'No se pudo guardar');
             }
-            
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnContent = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            submitBtn.disabled = true;
-            
-            try {
-                // 1. Verificar si ya existe en Firebase
-                const existingQuery = await db.collection('newsletter_users')
-                    .where('correo', '==', email)
-                    .get();
-                
-                if (!existingQuery.empty) {
-                    showMessage('error', 'Este email ya está suscrito');
-                    return;
-                }
-                
-                // 2. Guardar en Firebase
-                await db.collection('newsletter_users').add({
-                    correo: email,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                console.log('✅ Email guardado en Firebase');
-                
-                // 3. Enviar email de bienvenida
-                const response = await fetch('/newsletter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                });
-                
-                // Verificar si la respuesta es JSON válida
-                const contentType = response.headers.get('content-type');
-                let result;
-                
-                if (contentType && contentType.includes('application/json')) {
-                    result = await response.json();
-                } else {
-                    throw new Error('Respuesta del servidor no válida');
-                }
-                
-                if (result.success) {
-                    showMessage('success', '¡Suscripción exitosa! Revisa tu email para tu descuento de bienvenida.');
-                    emailInput.value = '';
-                } else {
-                    showMessage('error', result.message || 'Error al enviar email de bienvenida');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage('error', 'Error de conexión. Por favor intenta de nuevo.');
-            } finally {
-                submitBtn.innerHTML = originalBtnContent;
-                submitBtn.disabled = false;
+
+            console.log('✅ Email guardado en Firebase');
+
+            // 3. Enviar email de bienvenida
+            const response = await fetch('/newsletter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
+
+            // Verificar si la respuesta es JSON válida
+            const contentType = response.headers.get('content-type');
+            let resultServer;
+
+            if (contentType && contentType.includes('application/json')) {
+                resultServer = await response.json();
+            } else {
+                throw new Error('Respuesta del servidor no válida');
             }
-        });
-    }
+
+            if (resultServer.success) {
+                showMessage('success', '¡Suscripción exitosa! Revisa tu email para tu descuento de bienvenida.');
+                emailInput.value = '';
+            } else {
+                showMessage('error', resultServer.message || 'Error al enviar email de bienvenida');
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('error', 'Error de conexión. Por favor intenta de nuevo.');
+        } finally {
+            submitBtn.innerHTML = originalBtnContent;
+            submitBtn.disabled = false;
+        }
+    });
+}
+// ...existing code...
 });
 
 // Función para validar el formulario de contacto
