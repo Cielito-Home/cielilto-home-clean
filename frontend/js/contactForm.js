@@ -362,18 +362,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Manejar envío del formulario
-    const newsletterForm = document.getElementById('newsletterForm');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('newsletterEmail').value;
-            if (validateEmail(email)) {
-                showMessage('success', '¡Te has suscrito correctamente!');
-                newsletterForm.reset();
-            } else {
-                showMessage('error', 'Por favor ingresa un email válido');
-            }
-        });
-    }
 });
