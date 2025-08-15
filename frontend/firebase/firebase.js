@@ -275,6 +275,8 @@ window.app  = app;
 window.db   = db;
 window.auth = auth;
 
+window.saveNewsletter = saveNewsletter;
+
 // Puentes a tus helpers (admin.js llama “checkUserAuthorization” y “signOut”)
 window.checkUserAuthorization = async (email) => {
   // normaliza por si acaso
